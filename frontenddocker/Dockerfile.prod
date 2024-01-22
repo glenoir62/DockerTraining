@@ -1,0 +1,26 @@
+FROM node:alpine as build
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN ["npm", "run", "build"]
+
+FROM nginx
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+
+# Ici nous utilisons un multi-stage build, c'est-à-dire une construction d'image en plusieurs étapes.
+# Dans un multi-stage build vous pouvez utiliser plusieurs instructions FROM.
+# Chaque instruction FROM est une étape de la construction (build stage).
+# Il est possible de facilement copier le résultat d'un build entre des étapes différentes de la construction.
+# Cela permet ici de passer à une image de plus de 430 Mo à seulement 130 Mo et quelques :
+# nous n'avons pas Node.js, tout le code source et tous les modules.
+# Dans une application "classique", la différence serait encore plus flagrante,
+# avec une consommation souvent de l'ordre de 10 fois moins d'espace disque.
+
+# docker build -t reactprod -f Dockerfile.prod  .
+# docker run -p 80:80 --name nginx -d --restart always reactprod
+# docker run -p 80:80 --name nginx -d --restart always reactprod
+
+
+

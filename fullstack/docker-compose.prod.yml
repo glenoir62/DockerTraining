@@ -1,0 +1,67 @@
+version: "3.9"
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    environment:
+      - MONGO_USERNAME
+      - MONGO_PWD
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on:
+      - db
+  db:
+    image: mongo:7
+    volumes:
+      - type: volume
+        source: dbprod
+        target: /data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
+    restart: unless-stopped
+  reverse-proxy:
+    build:
+      context: ./reverse-proxy
+      dockerfile: Dockerfile.prod
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - type: bind
+        source: /etc/letsencrypt
+        target: /etc/letsencrypt
+    restart: unless-stopped
+    depends_on:
+      - api
+      - db
+      - client
+volumes:
+  dbprod:
+    external: true
+# docker volume create dbprod
+
+# docker compose -f docker-compose.prod.yml up --build
+
+# mongosh
+# use admin
+# db.auth({user: 'admin', pwd: 'password'})
+# db.createUser({user: 'jean', pwd: '123', roles:[{role: 'readWrite', db: 'test'}]})
+
+# db.count.insertOne({count: 0})
+# db.auth({user: 'jean', pwd: '123'})
+# db.count.findOne()
+
+# use test
+
+# Nous forçons la redirection des requêtes sur le port 80 (requêtes HTTP) sur le port 443 (HTTPS / HTTP2).
+
+# Pour le serveur virtuel écoutant sur le port 443, nous utilisons les certificats créés pour pouvoir utiliser HTTP2 (qui utilise TLS).
+
+# Nous spécifions que nous voulons les deux dernières versions de TLS pour les connexions client / serveur pour plus de sécurité.

@@ -1,0 +1,52 @@
+version: "3.9"
+services:
+  db:
+    image: mongo:7
+    volumes:
+      - type: volume
+        source: mydb
+        target: /data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
+    restart: "unless-stopped"
+  server:
+    build: .
+    ports:
+      - 80:80
+    volumes:
+      - type: bind
+        source: ./src
+        target: /app/src
+    environment:
+      - MONGO_PWD
+      - MONGO_USERNAME
+    depends_on:
+      - db
+    restart: "unless-stopped"
+volumes:
+  mydb:
+    external: true
+# docker volume create mydb
+# docker compose run -d db
+# docker-test_db_run_2031d0db2c39
+# docker exec -it xxxxxxx mongosh
+# use test
+# db.count.insertOne({count: 0});
+# db.count.findOne()
+
+# exit
+
+# docker compose down
+# use admin
+# db.auth({user: 'jean', pwd: '123456'})
+
+# docker compose exec db mongosh
+
+# docker volume rm mydb
+# docker volume create mydb
+
+#
+#
+# db.createUser({user: 'nodeapp', pwd: '123456', roles:[{role: 'readWrite', db: 'test'}]})
+#

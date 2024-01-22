@@ -1,0 +1,62 @@
+# La première instruction FROM permet de récupérer la dernière version de Node.js
+# basée sur une image alpine. Comme nous l'avons vu, la distribution alpine est souvent recommandée car elle est très légère et sécurisée.
+FROM node:alpine
+# La seconde instruction WORKDIR permet de configurer le répertoire de travail pour les instructions suivantes.
+# Elle permet également de créer le dossier s'il n'existe pas comme c'est le cas ici.
+WORKDIR /app
+# La troisième instruction COPY, permet de copier tout le contenu du contexte de build (contenu du dossier où est le Dockerfile par défaut) dans le WORKDIR.
+COPY ./package.json .
+# La dernière instruction permet de lancer nodemon. C'est un outil de développement pour Node.js qui permet de recharger l'application à chaque changement.
+RUN npm install
+COPY . .
+ENV PATH=$PATH:/app/node_modules/.bin
+CMD [ "nodemon", "src/app.js" ]
+
+# Il ne nous reste plus qu'à construire l'image :
+# docker build -t myapp .
+# docker container run -it -p 80:80 myapp
+
+# Error: Cannot find module '/app/nodemon'
+
+# Pour publier un port il faut utiliser l'option --publish ou -p.
+# L'instruction EXPOSE permet d'informer Docker qu'un conteneur écoute sur les ports spécifiés lors de son exécution.
+
+# Pour lancer notre application en mode détaché (pour reprendre la main dans le terminal) :
+# docker run -d --name appnode -p 80:80 myapp
+
+# Pour obtenir un terminal sur notre conteneur en cours d'exécution :
+# docker exec -it appnode sh
+
+# Pour voir la consommation des ressources de nos conteneurs en cours d'exécution :
+# docker container stats
+
+# docker logs appnode --follow
+
+# docker container run -it --name alpine1 --mount type=bind,source="$(pwd)",target=/data alpine sh
+
+# Notez que $(pwd) est une substitution de commande qui va être remplacée par la valeur de la variable d'environnement pwd,
+# qui contient le chemin absolu du répertoire courant. (Pour en savoir plus voyez le cours Linux).
+
+# cat /data/node-server/data/hello.txt
+
+# docker build -t myapp .
+
+# docker run -p 80:80 --mount type=bind,source="$(pwd)/src",target=/app/src myapp
+
+# docker container run -d --name mongodb mongo
+# docker container logs mongodb
+# docker container exec -it mongodb mongosh
+
+# db.user.insertOne({name: "jean"})
+# db.user.findOne()
+
+
+
+
+
+
+
+
+
+
+

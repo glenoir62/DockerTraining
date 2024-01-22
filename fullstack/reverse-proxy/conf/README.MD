@@ -1,0 +1,16 @@
+server {
+listen 443 ssl http2;
+ssl_certificate /etc/letsencrypt/live/www.sandbox-dyma.ovh/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/www.sandbox-dyma.ovh/privkey.pem;
+ssl_trusted_certificate /etc/letsencrypt/live/www.sandbox-dyma.ovh/chain.pem;
+ssl_protocols TLSv1.2 TLSv1.3;
+
+    location / {
+        proxy_pass http://client;
+    }
+
+    location /api {
+        proxy_pass http://api;
+    }
+
+}
